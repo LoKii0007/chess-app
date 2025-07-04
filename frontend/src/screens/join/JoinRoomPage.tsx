@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import UseSocket from "../../hooks/useSocket";
+import { useSocket } from "../../context/socketContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { INIT_GAME } from "../../components/message";
 
 const JoinRoomPage = () => {
   const [roomId, setRoomId] = useState("");
-  const socket = UseSocket();
+  const { socket } = useSocket();
   const navigate = useNavigate();
   const [roomJoined, setRoomJoined] = useState(false);
 
@@ -22,13 +23,15 @@ const JoinRoomPage = () => {
       const message = JSON.parse(event.data);
       switch (message.type) {
         case "ROOM_JOINED":
-          console.log("joined room", message.payload);
           toast.success("Joined room successfully");
           setRoomJoined(true);
           break;
-        case "GAME_STARTED":
-          console.log("game started", message.payload);
-          navigate(`/game/${message.payload}`);
+        case INIT_GAME:
+          navigate(`/room/${message.payload.gameId}`, {
+            state: {
+              gameData: message.payload,
+            },
+          });
           break;
         case "ERROR":
           toast.error(
@@ -38,12 +41,22 @@ const JoinRoomPage = () => {
         case "ROOM_NOT_FOUND":
           toast.error("Room not found");
           break;
+
         case "ROOM_FULL":
           toast.error("Room is full");
           break;
-        case "LEAVE_ROOM_SUCCESS":
-          toast.success("Left room successfully");
-          setRoomJoined(false);
+
+        case "OPPONENT_LEFT":
+          toast("Opponent left the room");
+          break;
+
+        case "LEFT_ROOM":
+          toast("You left the room");
+          navigate("/");
+          break;
+
+        case "ROOM_DELETED":
+          toast("Room deleted");
           navigate("/");
           break;
       }

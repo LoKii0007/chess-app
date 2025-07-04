@@ -22,7 +22,7 @@ export default function Navbar() {
             onClick={() => handleCreateRoom()}
             className="nav-right-btn cursor-pointer px-4 bg-white text-black rounded-full py-2"
           >
-            Create room
+            Private room
           </button>
         </div>
       </div>

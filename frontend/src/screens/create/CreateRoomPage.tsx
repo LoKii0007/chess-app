@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import UseSocket from "../../hooks/useSocket";
+import { useSocket } from "../../context/socketContext";
+import { INIT_GAME } from "../../components/message";
 
 const CreateRoomPage = () => {
-  const socket = UseSocket();
+  const { socket } = useSocket();
   const navigate = useNavigate();
   const [canStartGame, setCanStartGame] = useState(false);
   const [isRoomCreated, setIsRoomCreated] = useState(false);
@@ -16,15 +17,10 @@ const CreateRoomPage = () => {
 
   useEffect(() => {
     if (!socket) {
-      console.log("No socket connection available");
       return;
     }
 
-    console.log("Setting up socket message handler for room:", roomId);
-
     const handleSocketMessage = (event: MessageEvent) => {
-      console.log("Raw socket message received:", event.data);
-
       try {
         const message = JSON.parse(event.data);
 
@@ -39,20 +35,30 @@ const CreateRoomPage = () => {
               toast.success("Opponent joined the room");
             }
             break;
-          case "OPPONENT_LEFT":
-            console.log("Opponent left the room");
-            setCanStartGame(false);
-            toast.success("Opponent left the room");
+          case INIT_GAME:
+            toast.success("Game started");
+            navigate(`/room/${message.payload.gameId}`, {
+              state: {
+                gameData: message.payload,
+              },
+            });
             break;
-          case "ROOM_DELETED":
+
+          case "OPPONENT_LEFT":
             setCanStartGame(false);
-            toast.error("Room was deleted");
+            toast("Opponent left the room");
+            break;
+
+          case "LEFT_ROOM":
+            toast("You left the room");
             navigate("/");
             break;
-          case "GAME_STARTED":
-            toast.success("Game started");
-            navigate(`/game/${message.payload}`);
+
+          case "ROOM_DELETED":
+            toast("You left the room");
+            navigate("/");
             break;
+
           case "ERROR":
             console.error("Socket error:", message.payload);
             toast.error(
@@ -90,7 +96,6 @@ const CreateRoomPage = () => {
       return;
     }
 
-    console.log("Sending START_GAME message for room:", roomId);
     socket.send(JSON.stringify({ type: "START_GAME", payload: { roomId } }));
   };
 

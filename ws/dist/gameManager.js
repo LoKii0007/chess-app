@@ -193,25 +193,27 @@ class Gamemanager {
                 console.log("leaving room", room === null || room === void 0 ? void 0 : room.gameId);
                 if (room) {
                     if (room.player1 === user) {
+                        console.log("player 1 left");
                         room.player1 = null;
                         user.socket.send(JSON.stringify({
-                            type: "LEAVE_ROOM_SUCCESS",
+                            type: "ROOM_DELETED",
                             payload: roomId,
                         }));
                         (_e = room.player2) === null || _e === void 0 ? void 0 : _e.socket.send(JSON.stringify({
-                            type: "OPPONENT_LEFT",
+                            type: "ROOM_DELETED",
                             payload: roomId,
                         }));
                         this.rooms.splice(this.rooms.indexOf(room), 1);
                     }
                     else if (room.player2 === user) {
+                        console.log("player 2 left");
                         room.player2 = null;
                         (_f = room.player1) === null || _f === void 0 ? void 0 : _f.socket.send(JSON.stringify({
-                            type: "ROOM_DELETED",
+                            type: "OPPONENT_LEFT",
                             payload: roomId,
                         }));
                         user.socket.send(JSON.stringify({
-                            type: "LEAVE_ROOM_SUCCESS",
+                            type: "LEFT_ROOM",
                             payload: roomId,
                         }));
                     }

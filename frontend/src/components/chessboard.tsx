@@ -1,6 +1,6 @@
-import type { Square, PieceSymbol, Color } from "chess.js";
+import { type Square, type PieceSymbol, type Color } from "chess.js";
 import { useState } from "react";
-import type { Move } from "../screens/gamePage";
+import { type Move } from "../screens/gamePage";
 import { MOVE } from "./message";
 import toast from "react-hot-toast";
 import "../css/landing.css";
@@ -25,20 +25,62 @@ export default function Chessboard({
     color: Color;
   } | null)[][];
   setBoard: any;
-  // setBoard: React.Dispatch<React.SetStateAction<({
-  //     square: Square,
-  //     type: PieceSymbol,
-  //     color: Color
-  // } | null)[][]>>
 }) {
   const [from, setFrom] = useState<null | Square>(null);
 
-  // const [to, setTo] = useState<null | Square>(null)
-  // const [isValid, setIsValid] = useState<false | true>(true)
-  // const [selectedSquare, setSelectedSquare] = useState<false | true>(false)
-
   // const isMyTurn = myColor === chess.turn()
   const isMyTurn = playerColor === chess.turn();
+
+  const handleMove = (from: Square | null, to: Square, square: any) => {
+    {
+      if (!from && square.color !== chess.turn()) {
+        return;
+      }
+      if (!isMyTurn) {
+        return;
+      }
+      if (from === to) {
+        setFrom(null);
+      }
+      //update this
+      if (from && square?.color === playerColor && square.type) {
+        setFrom(to);
+      }
+      if (!from) {
+        setFrom(to);
+      } else if (
+        (from && square?.color === undefined) ||
+        (from && square?.color !== playerColor)
+      ) {
+        try {
+          socket.send(
+            JSON.stringify({
+              type: MOVE,
+              payload: {
+                move: {
+                  from,
+                  to,
+                },
+              },
+            })
+          );
+          chess.move({
+            from,
+            to,
+          });
+          setBoard(chess.board());
+          console.log({
+            from,
+            to,
+          });
+          setMoves((moves) => [...moves, { from, to }]);
+          setFrom(null);
+        } catch (error) {
+          toast.error("invalid move");
+        }
+      }
+    }
+  };
 
   return (
     <div className="flex">
@@ -52,76 +94,13 @@ export default function Chessboard({
                 ) +
                   "" +
                   (8 - i)) as Square;
-                // console.log(squareRepresentation)
                 return (
                   <div
-                    onClick={() => {
-                      // console.log('from ',from)
-                      // console.log('sq ', squareRepresentation)
-                      console.log("color : ", square?.color);
-                      if (!from && square?.color !== chess.turn()) {
-                        return;
-                      }
-                      if (!isMyTurn) {
-                        return;
-                      }
-                      if (from === squareRepresentation) {
-                        setFrom(null);
-                      }
-                      //update this
-                      if (
-                        from &&
-                        square?.color === playerColor &&
-                        square.type
-                      ) {
-                        // console.log('sq color' , square?.color)
-                        // console.log('plr color' , playerColor)
-                        // console.log('sq type ' , square?.type)
-                        setFrom(squareRepresentation);
-                      }
-                      if (!from) {
-                        setFrom(squareRepresentation);
-                        // setIsValid(true)
-                        // console.log(from)
-                      } else if (
-                        (from && square?.color === undefined) ||
-                        (from && square?.color !== playerColor)
-                      ) {
-                        try {
-                          socket.send(
-                            JSON.stringify({
-                              type: MOVE,
-                              payload: {
-                                move: {
-                                  from,
-                                  to: squareRepresentation,
-                                },
-                              },
-                            })
-                          );
-                          chess.move({
-                            from,
-                            to: squareRepresentation,
-                          });
-                          setBoard(chess.board());
-                          console.log({
-                            from,
-                            to: squareRepresentation,
-                          });
-                          setMoves((moves) => [
-                            ...moves,
-                            { from, to: squareRepresentation },
-                          ]);
-                          setFrom(null);
-                        } catch (error) {
-                          // setIsValid(false)
-                          toast.error("invalid move");
-                          // console.log(error)
-                        }
-                      }
-                    }}
+                    onClick={() =>
+                      handleMove(from, squareRepresentation, square)
+                    }
                     key={j}
-                    className={`w-20 h-20 ${
+                    className={`xl:w-18 xl:h-18 w-14 h-14 ${
                       (i + j) % 2 === 0 ? "bg-[#75A47F]" : "bg-white"
                     } ${from === squareRepresentation && "selected-square"} `}
                   >
