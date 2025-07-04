@@ -28,7 +28,7 @@ class Gamemanager {
     }
     addHandler(user) {
         user.socket.on("message", (data) => __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f;
             const message = JSON.parse(data.toString());
             if (message.type == message_1.INIT_GAME) {
                 if (this.pendingUser2) {
@@ -93,7 +93,7 @@ class Gamemanager {
                 if (!room) {
                     user.socket.send(JSON.stringify({
                         type: "ERROR",
-                        payload: "Room not found"
+                        payload: "Room not found",
                     }));
                     return;
                 }
@@ -101,7 +101,7 @@ class Gamemanager {
                 if (((_a = room.player1) === null || _a === void 0 ? void 0 : _a.id) === user.id) {
                     user.socket.send(JSON.stringify({
                         type: "ERROR",
-                        payload: "Cannot join your own room"
+                        payload: "Cannot join your own room",
                     }));
                     return;
                 }
@@ -109,13 +109,17 @@ class Gamemanager {
                 if (room.player2) {
                     user.socket.send(JSON.stringify({
                         type: "ERROR",
-                        payload: "Room is already full"
+                        payload: "Room is already full",
                     }));
                     return;
                 }
                 // Set player2 and notify both players
                 room.player2 = user;
-                console.log("Player joined room:", { roomId, player1: (_b = room.player1) === null || _b === void 0 ? void 0 : _b.id, player2: room.player2.id });
+                console.log("Player joined room:", {
+                    roomId,
+                    player1: (_b = room.player1) === null || _b === void 0 ? void 0 : _b.id,
+                    player2: room.player2.id,
+                });
                 (_c = room.player1) === null || _c === void 0 ? void 0 : _c.socket.send(JSON.stringify({
                     type: "ROOM_JOINED",
                     payload: roomId,
@@ -151,13 +155,36 @@ class Gamemanager {
                         type: "ERROR",
                         payload: "Room not found",
                     }));
+                    return;
                 }
-                else {
-                    if (room.player1 && room.player2) {
-                        const game = new Game_1.Game({ id: room.player1.id, socket: room.player1.socket }, { id: room.player2.id, socket: room.player2.socket });
-                        this.games.push(game);
-                        this.rooms.splice(this.rooms.indexOf(room), 1);
-                    }
+                // Check if user is the room owner
+                if (((_d = room.player1) === null || _d === void 0 ? void 0 : _d.id) !== user.id) {
+                    user.socket.send(JSON.stringify({
+                        type: "ERROR",
+                        payload: "Only room owner can start the game",
+                    }));
+                    return;
+                }
+                if (!room.player2) {
+                    user.socket.send(JSON.stringify({
+                        type: "ERROR",
+                        payload: "Cannot start game without opponent",
+                    }));
+                    return;
+                }
+                if (room.player1 && room.player2) {
+                    const game = new Game_1.Game({ id: room.player1.id, socket: room.player1.socket }, { id: room.player2.id, socket: room.player2.socket });
+                    this.games.push(game);
+                    // Send GAME_STARTED message to both players
+                    const gameStartedMessage = {
+                        type: "GAME_STARTED",
+                        payload: game.gameId, // Make sure your Game class has a gameId property
+                    };
+                    room.player1.socket.send(JSON.stringify(gameStartedMessage));
+                    room.player2.socket.send(JSON.stringify(gameStartedMessage));
+                    // Remove the room from rooms array
+                    this.rooms.splice(this.rooms.indexOf(room), 1);
+                    console.log("Game started:", game.gameId);
                 }
             }
             if (message.type === "LEAVE_ROOM") {
@@ -171,7 +198,7 @@ class Gamemanager {
                             type: "LEAVE_ROOM_SUCCESS",
                             payload: roomId,
                         }));
-                        (_d = room.player2) === null || _d === void 0 ? void 0 : _d.socket.send(JSON.stringify({
+                        (_e = room.player2) === null || _e === void 0 ? void 0 : _e.socket.send(JSON.stringify({
                             type: "OPPONENT_LEFT",
                             payload: roomId,
                         }));
@@ -179,7 +206,7 @@ class Gamemanager {
                     }
                     else if (room.player2 === user) {
                         room.player2 = null;
-                        (_e = room.player1) === null || _e === void 0 ? void 0 : _e.socket.send(JSON.stringify({
+                        (_f = room.player1) === null || _f === void 0 ? void 0 : _f.socket.send(JSON.stringify({
                             type: "ROOM_DELETED",
                             payload: roomId,
                         }));

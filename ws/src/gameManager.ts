@@ -106,7 +106,7 @@ export class Gamemanager {
           user.socket.send(
             JSON.stringify({
               type: "ERROR",
-              payload: "Room not found"
+              payload: "Room not found",
             })
           );
           return;
@@ -117,7 +117,7 @@ export class Gamemanager {
           user.socket.send(
             JSON.stringify({
               type: "ERROR",
-              payload: "Cannot join your own room"
+              payload: "Cannot join your own room",
             })
           );
           return;
@@ -128,7 +128,7 @@ export class Gamemanager {
           user.socket.send(
             JSON.stringify({
               type: "ERROR",
-              payload: "Room is already full"
+              payload: "Room is already full",
             })
           );
           return;
@@ -136,8 +136,12 @@ export class Gamemanager {
 
         // Set player2 and notify both players
         room.player2 = user;
-        console.log("Player joined room:", { roomId, player1: room.player1?.id, player2: room.player2.id });
-        
+        console.log("Player joined room:", {
+          roomId,
+          player1: room.player1?.id,
+          player2: room.player2.id,
+        });
+
         room.player1?.socket.send(
           JSON.stringify({
             type: "ROOM_JOINED",
@@ -175,6 +179,7 @@ export class Gamemanager {
       if (message.type === "START_GAME") {
         const roomId = message.payload.roomId;
         const room = this.rooms.find((room) => room.gameId === roomId);
+
         if (!room) {
           user.socket.send(
             JSON.stringify({
@@ -182,15 +187,50 @@ export class Gamemanager {
               payload: "Room not found",
             })
           );
-        } else {
-          if (room.player1 && room.player2) {
-            const game = new Game(
-              { id: room.player1.id, socket: room.player1.socket },
-              { id: room.player2.id, socket: room.player2.socket }
-            );
-            this.games.push(game);
-            this.rooms.splice(this.rooms.indexOf(room), 1);
-          }
+          return;
+        }
+
+        // Check if user is the room owner
+        if (room.player1?.id !== user.id) {
+          user.socket.send(
+            JSON.stringify({
+              type: "ERROR",
+              payload: "Only room owner can start the game",
+            })
+          );
+          return;
+        }
+
+        if (!room.player2) {
+          user.socket.send(
+            JSON.stringify({
+              type: "ERROR",
+              payload: "Cannot start game without opponent",
+            })
+          );
+          return;
+        }
+
+        if (room.player1 && room.player2) {
+          const game = new Game(
+            { id: room.player1.id, socket: room.player1.socket },
+            { id: room.player2.id, socket: room.player2.socket }
+          );
+          this.games.push(game);
+
+          // Send GAME_STARTED message to both players
+          const gameStartedMessage = {
+            type: "GAME_STARTED",
+            payload: game.gameId, // Make sure your Game class has a gameId property
+          };
+
+          room.player1.socket.send(JSON.stringify(gameStartedMessage));
+          room.player2.socket.send(JSON.stringify(gameStartedMessage));
+
+          // Remove the room from rooms array
+          this.rooms.splice(this.rooms.indexOf(room), 1);
+
+          console.log("Game started:", game.gameId);
         }
       }
 

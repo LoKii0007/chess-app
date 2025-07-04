@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState } from "react";
 
 interface AccountContextType {
   activeUser: object;
@@ -10,11 +10,7 @@ export const AccountContext = createContext<AccountContextType>({
   setActiveUser: () => {},
 });
 
-interface AccountStateProps {
-  children: ReactNode;
-}
-
-const AccountState: React.FC<AccountStateProps> = (props) => {
+const AccountState = (props: any) => {
   const [activeUser, setActiveUser] = useState<object>({});
 
   return (

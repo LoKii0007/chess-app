@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />}></Route>
           <Route path="/game/:gameId" element={<GamePage />}></Route>
-          <Route path="/create/room/:roomId" element={<CreateRoomPage />}></Route>
+          <Route path="/create/room" element={<CreateRoomPage />}></Route>
           <Route path="/join/room" element={<JoinRoomPage />}></Route>
         </Routes>
         <Toaster />

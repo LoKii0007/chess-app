@@ -1,44 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import UseSocket from "../hooks/useSocket";
-import { useEffect } from "react";
-import toast from "react-hot-toast";
 
 export default function Navbar() {
   const navigate = useNavigate();
 
-  const socket = UseSocket();
-
-  useEffect(() => {
-    if (!socket) {
-      return;
-    }
-
-    const handleSocketMessage = (event: MessageEvent) => {
-      const message = JSON.parse(event.data);
-      switch (message.type) {
-        case "ROOM_CREATED":
-          try {
-            console.log(message.payload);
-            navigate(`/create/room/${message.payload}`);
-          } catch (error) {
-            console.log(error);
-          }
-          break;
-        case "ERROR":
-          toast.error(message.payload || "Something went wrong. Please try again later.");
-          break;
-      }
-    };
-
-    socket.addEventListener("message", handleSocketMessage);
-
-    return () => {
-      socket.removeEventListener("message", handleSocketMessage);
-    };
-  }, [socket]);
-
   const handleCreateRoom = () => {
-    socket?.send(JSON.stringify({ type: "CREATE_ROOM" }));
+    navigate("/create/room");
   };
 
   return (
