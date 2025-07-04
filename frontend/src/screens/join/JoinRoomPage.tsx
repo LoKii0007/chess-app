@@ -11,7 +11,14 @@ const JoinRoomPage = () => {
   const [roomJoined, setRoomJoined] = useState(false);
 
   const handleJoinRoom = () => {
-    socket?.send(JSON.stringify({ type: "JOIN_ROOM", payload: { roomId } }));
+    if (!socket) {
+      return;
+    }
+    if (!roomId || roomId.length !== 36) {
+      toast.error("Please enter a valid room ID");
+      return;
+    }
+    socket.send(JSON.stringify({ type: "JOIN_ROOM", payload: { roomId } }));
   };
 
   useEffect(() => {
@@ -82,15 +89,16 @@ const JoinRoomPage = () => {
         Leave Room
       </button>
 
-      <div>
+      <div className="w-full ">
         {roomJoined ? (
-          <div className="text-white text-xl">
+          <div className="text-white text-xl text-center">
             Waiting for Owner to start the game
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-4">
-            <div>
+          <div className="flex flex-col items-center justify-center gap-6">
+            <div className="w-full max-w-md">
               <input
+                className="bg-zinc-800 text-white px-4 py-2 rounded-xl focus:outline-none w-full"
                 type="text"
                 placeholder="Room ID"
                 value={roomId}
@@ -100,7 +108,7 @@ const JoinRoomPage = () => {
             <button
               disabled={!roomId}
               onClick={handleJoinRoom}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer"
+              className="bg-emerald-100 text-black px-6 py-2 rounded-xl cursor-pointer hover:bg-emerald-200"
             >
               Join Room
             </button>

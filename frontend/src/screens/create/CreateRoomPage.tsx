@@ -119,33 +119,37 @@ const CreateRoomPage = () => {
       </button>
 
       <div className="text-center space-y-6">
-        <h2 className="text-2xl font-bold">Room Created</h2>
-        <div className="text-lg">
-          <span className="text-gray-400">Room ID:</span>
-          <span className="font-mono bg-gray-700 px-2 py-1 rounded ml-2">
-            {roomId}
-          </span>
-        </div>
+        {roomId && (
+          <>
+            <h2 className="text-2xl font-bold">Room Created</h2>
+            <div className="text-lg">
+              <span className="text-gray-400">Room ID:</span>
+              <span className="font-mono bg-gray-700 px-2 py-1 rounded ml-2">
+                {roomId}
+              </span>
+            </div>
+
+            {!canStartGame ? (
+              <div className="text-yellow-400">
+                <div className="animate-pulse">
+                  Waiting for opponent to join...
+                </div>
+                <div className="text-sm text-gray-400 mt-2">
+                  Share the room ID with your opponent
+                </div>
+              </div>
+            ) : (
+              <div className="text-green-400">
+                <div>✓ Opponent joined!</div>
+                <div className="text-sm text-gray-400 mt-2">
+                  Ready to start the game
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
         <div className="space-y-4">
-          {!canStartGame ? (
-            <div className="text-yellow-400">
-              <div className="animate-pulse">
-                Waiting for opponent to join...
-              </div>
-              <div className="text-sm text-gray-400 mt-2">
-                Share the room ID with your opponent
-              </div>
-            </div>
-          ) : (
-            <div className="text-green-400">
-              <div>✓ Opponent joined!</div>
-              <div className="text-sm text-gray-400 mt-2">
-                Ready to start the game
-              </div>
-            </div>
-          )}
-
           {isRoomCreated ? (
             <>
               <button

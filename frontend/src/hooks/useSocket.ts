@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const UseSocket = () => {
   const WS_URL = "ws://localhost:8080"

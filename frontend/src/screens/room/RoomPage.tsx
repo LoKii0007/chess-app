@@ -3,7 +3,7 @@ import Chessboard from "../../components/chessboard";
 import { useSocket } from "../../context/socketContext";
 import { Chess } from "chess.js";
 import type { Color, Square } from "chess.js";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   CHECKMATE,
   GAME_OVER,
@@ -19,26 +19,14 @@ export interface Move {
   to: Square;
 }
 
-interface Metadata {
-  whitePlayer: {
-    id: string;
-    name: string;
-  };
-  blackPlayer: {
-    id: string;
-    name: string;
-  };
-}
 
 export default function RoomPage() {  
   const { socket } = useSocket();
-  const { gameId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
 
   const [chess, _setChess] = useState(new Chess());
-  const [gameMetadata, setGameMetadata] = useState<Metadata | null>(null);
   const [board, setBoard] = useState(chess.board());
   const [moves, setMoves] = useState<Move[]>([]);
   const [playerColor, setPlayerColor] = useState<Color>();
@@ -93,10 +81,6 @@ export default function RoomPage() {
     const gameData = location.state?.gameData;
     if (gameData) {
       setBoard(chess.board());
-      setGameMetadata({
-        whitePlayer: gameData.whitePlayer,
-        blackPlayer: gameData.blackPlayer,
-      });
       setPlayerColor(gameData.color);
     }
   }, [location.state, chess]);
