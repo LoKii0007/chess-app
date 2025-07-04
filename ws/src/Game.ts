@@ -50,7 +50,7 @@ export class Game {
     );
   }
 
-  async makeMove(socket: WebSocket, move: { from: string; to: string }) {
+  makeMove(socket: WebSocket, move: { from: string; to: string }) {
     //validation
 
     //is the user valid

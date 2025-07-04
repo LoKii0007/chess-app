@@ -86,7 +86,6 @@ const CreateRoomPage = () => {
 
   const handleStartGame = () => {
     if (!socket) {
-      console.log("Cannot start game - no socket connection");
       toast.error("No connection available");
       return;
     }
