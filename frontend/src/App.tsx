@@ -10,8 +10,8 @@ import RoomPage from "./screens/room/RoomPage";
 function App() {
   return (
     <>
-      <SocketProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <SocketProvider>
           <Routes>
             <Route path="/" element={<Landing />}></Route>
             <Route path="/game/:gameId" element={<GamePage />}></Route>
@@ -20,8 +20,8 @@ function App() {
             <Route path="/room/:roomId" element={<RoomPage />}></Route>
           </Routes>
           <Toaster />
-        </BrowserRouter>
-      </SocketProvider>
+        </SocketProvider>
+      </BrowserRouter>
     </>
   );
 }

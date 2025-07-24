@@ -1,15 +1,17 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const socketContext = createContext<{
   socket: WebSocket | null;
   setSocket: React.Dispatch<React.SetStateAction<WebSocket | null>>;
   isConnected: boolean;
   reconnect: () => void;
-}>({ 
-  socket: null, 
-  setSocket: () => {}, 
-  isConnected: false, 
-  reconnect: () => {} 
+}>({
+  socket: null,
+  setSocket: () => {},
+  isConnected: false,
+  reconnect: () => {},
 });
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
@@ -19,13 +21,19 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const reconnectTimeoutRef = useRef<number | null>(null);
   const pingIntervalRef = useRef<number | null>(null);
   const reconnectAttempts = useRef(0);
-  const maxReconnectAttempts = 5;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setTimeout(() => {
+      toast("Running on a free server, so the game auto-ends in 20 minutes.");
+    }, 500);
+  }, []);
 
   const startKeepAlive = (ws: WebSocket) => {
     // Send ping every 30 seconds to keep connection alive
     pingIntervalRef.current = setInterval(() => {
       if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'ping' }));
+        ws.send(JSON.stringify({ type: "ping" }));
       }
     }, 30000);
   };
@@ -39,7 +47,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   const connect = () => {
     console.log("Attempting to connect to WebSocket...");
-    
+
     if (socket?.readyState === WebSocket.OPEN) {
       console.log("WebSocket already connected");
       return;
@@ -57,34 +65,24 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      
+
       // Handle ping/pong messages for keep-alive
-      if (message.type === 'ping') {
-        ws.send(JSON.stringify({ type: 'pong' }));
-      } else if (message.type === 'pong') {
+      if (message.type === "ping") {
+        ws.send(JSON.stringify({ type: "pong" }));
+      } else if (message.type === "pong") {
         console.log("Received pong from server");
       }
-      
+
       // Note: Other message handling will be done by individual components
     };
 
     ws.onclose = (event) => {
       console.log("WebSocket disconnected:", event.reason, "Code:", event.code);
+      toast("Oops! Connection to the server was interrupted.Please refresh the page");
       setSocket(null);
       setIsConnected(false);
       stopKeepAlive();
-      
-      // Attempt to reconnect if not intentionally closed
-      if (event.code !== 1000 && reconnectAttempts.current < maxReconnectAttempts) {
-        reconnectAttempts.current++;
-        console.log(`Attempting to reconnect... (${reconnectAttempts.current}/${maxReconnectAttempts})`);
-        
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000)); // Exponential backoff, max 30s
-      } else if (reconnectAttempts.current >= maxReconnectAttempts) {
-        console.log("Max reconnection attempts reached");
-      }
+      navigate("/");
     };
 
     ws.onerror = (error) => {
@@ -117,7 +115,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <socketContext.Provider value={{ socket, setSocket, isConnected, reconnect }}>
+    <socketContext.Provider
+      value={{ socket, setSocket, isConnected, reconnect }}
+    >
       {children}
     </socketContext.Provider>
   );
