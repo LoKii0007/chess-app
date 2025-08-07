@@ -28,8 +28,8 @@ export class Game {
         payload: {
           color: "w",
           gameId: this.gameId,
-          whitePlayer: { name: "loki", id: this.player1.id },
-          blackPlayer: { name: "loki", id: this.player2.id },
+          whitePlayer: { name: "Player A", id: this.player1.id },
+          blackPlayer: { name: "Player B", id: this.player2.id },
           fen: this.board.fen(),
           moves: [],
         },
