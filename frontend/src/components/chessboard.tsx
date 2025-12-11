@@ -83,8 +83,8 @@ export default function Chessboard({
   };
 
   return (
-    <div className="flex">
-      <div className="text-white-200">
+    <div className="flex justify-center">
+      <div className="text-white-200 border-4 border-zinc-800">
         {board.map((row, i) => {
           return (
             <div className="flex" key={i}>

@@ -6,6 +6,7 @@ import JoinRoomPage from "./screens/join/JoinRoomPage";
 import CreateRoomPage from "./screens/create/CreateRoomPage";
 import { SocketProvider } from "./context/socketContext";
 import RoomPage from "./screens/room/RoomPage";
+import './App.css'
 
 function App() {
   return (
