@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import { useAuth } from "../../context/authContext";
 import toast from "react-hot-toast";
 import { Loader2, ArrowLeft } from "lucide-react";
-import Navbar from "../../components/common/navbar";
 
 const RegisterPage = () => {
   const navigate = useNavigate();

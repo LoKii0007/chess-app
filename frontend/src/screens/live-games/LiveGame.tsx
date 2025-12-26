@@ -1,10 +1,10 @@
-import { use, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Chess } from "chess.js";
 import { motion, AnimatePresence } from "motion/react";
 import { User, Trophy, Activity } from "lucide-react";
 import toast from "react-hot-toast";
-import PlayerCard from "../../components/common/PlayerCard";
+// import PlayerCard from "../../components/common/PlayerCard";
 // import MoveTable from "../../components/MoveTable";
 import {
   CHECKMATE,
