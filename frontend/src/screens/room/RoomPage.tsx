@@ -1,35 +1,29 @@
 import { useEffect, useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Chess, type Color, type Square } from "chess.js";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Chess, type Color } from "chess.js";
 import { motion, AnimatePresence } from "motion/react";
 import { User, Trophy, Activity } from "lucide-react";
 import toast from "react-hot-toast";
-
-// Context & Components
-import { useSocket } from "../../context/socketContext";
-import Chessboard from "../../components/chessboard";
-import MoveTable from "../../components/MoveTable";
-import PlayerCard from "../../components/PlayerCard";
+import Chessboard from "../../components/common/chessboard";
+import MoveTable from "../../components/common/MoveTable";
+import PlayerCard from "../../components/common/PlayerCard";
 import {
   CHECKMATE,
   GAME_OVER,
   MOVE,
   OPPONENT_DISCONNECTED,
-} from "../../components/message";
-
-// Types
-export interface Move {
-  from: Square;
-  to: Square;
-  san?: string;
-}
-
-
+  OPPONENT_LEFT,
+  LEFT_ROOM,
+  ROOM_DELETED,
+} from "../../utils/message";
+import { getSocket } from "../../lib/socket";
+import { type Move } from "../../types/types";
 
 export default function RoomPage() {
-  const { socket } = useSocket();
+  const { socket } = getSocket();
   const location = useLocation();
   const navigate = useNavigate();
+  const { gameId } = useParams();
 
   const [chess, _setChess] = useState(new Chess());
   const [board, setBoard] = useState(chess.board());
@@ -42,11 +36,11 @@ export default function RoomPage() {
   // Scroll to bottom of move list
   const movesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (movesEndRef.current) {
-      movesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [moves]);
+  // useEffect(() => {
+  //   if (movesEndRef.current) {
+  //     movesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // }, [moves]);
 
   useEffect(() => {
     if (!socket) {
@@ -72,16 +66,16 @@ export default function RoomPage() {
           setResult(message.payload.result);
           break;
 
-        case "OPPONENT_LEFT":
+        case OPPONENT_LEFT:
           toast("Opponent left the room");
           break;
 
-        case "LEFT_ROOM":
+        case LEFT_ROOM:
           toast("You left the room");
           navigate("/");
           break;
 
-        case "ROOM_DELETED":
+        case ROOM_DELETED:
           toast("You left the room");
           navigate("/");
           break;
@@ -111,7 +105,7 @@ export default function RoomPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col lg:flex-row pt-[70px]">
       {/* --- Left / Top Section: The Board --- */}
       <div className="flex-1 flex flex-col justify-center items-center p-4 lg:p-8 relative">
         {/* Mobile: Opponent Info Top */}
@@ -141,6 +135,7 @@ export default function RoomPage() {
             board={board}
             setBoard={setBoard}
             socket={socket}
+            gameId={gameId}
           />
 
           {/* Overlay for Game Over */}

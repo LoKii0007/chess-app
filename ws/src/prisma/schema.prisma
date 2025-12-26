@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String @id @default(uuid())
+  fName    String
+  lName    String
+  username String @unique
+  password String
+  moves    Move[]
+  games1   Game[] @relation("Player1Relation")
+  games2   Game[] @relation("Player2Relation")
+}
+
+model Game {
+  id         String   @id @default(ulid())
+  player1Id  String
+  player2Id  String
+  player1    User     @relation("Player1Relation", fields: [player1Id], references: [id])
+  player2    User     @relation("Player2Relation", fields: [player2Id], references: [id])
+  createdAt  DateTime
+  updatedAt  DateTime
+  gameStatus String
+  gameResult String
+  gameMode   String
+  moves      Move[]
+}
+
+model Move {
+  id        String   @id @default(uuid())
+  from      String
+  to        String
+  createdAt DateTime
+  gameId    String
+  userId    String
+  game      Game     @relation(fields: [gameId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
