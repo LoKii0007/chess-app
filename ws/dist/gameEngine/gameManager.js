@@ -366,12 +366,7 @@ class GameManager {
         //* publish
         const liveGames = [];
         this.games.forEach((game) => {
-            const gameData = {
-                player1: { id: game.player1.id, username: game.player1.username },
-                player2: { id: game.player2.id, username: game.player2.username },
-                startTime: game.startTime,
-                gameId: game.gameId
-            };
+            const gameData = (0, helper_1.gameListPayload)(game);
             liveGames.push(gameData);
         });
         redis_1.publisherClient.publish(message_1.LIVE_GAMES_LIST, JSON.stringify({ liveGames }));
@@ -392,12 +387,7 @@ class GameManager {
         this.games.delete(gameId);
         const liveGames = [];
         this.games.forEach((game) => {
-            const gameData = {
-                player1: game.player1,
-                player2: game.player2,
-                startTime: game.startTime,
-                gameId: game.gameId
-            };
+            const gameData = (0, helper_1.gameListPayload)(game);
             liveGames.push(gameData);
         });
         redis_1.publisherClient.publish(message_1.LIVE_GAMES_LIST, JSON.stringify({ liveGames }));

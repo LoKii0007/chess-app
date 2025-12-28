@@ -1,11 +1,10 @@
 import { WebSocket } from "ws";
 import { Game } from "./Game";
-import { CREATE_ROOM, CREATE_USER, INIT_GAME, JOIN_ROOM, LEAVE_ROOM, LIVE_GAMES_LIST, MOVE, MOVE_MADE, OPPONENT_DISCONNECTED, START_GAME, LIVE_GAME } from "../utils/message";
+import { CREATE_ROOM, INIT_GAME, JOIN_ROOM, LEAVE_ROOM, LIVE_GAMES_LIST, MOVE, OPPONENT_DISCONNECTED, START_GAME, LIVE_GAME } from "../utils/message";
 import { User } from "./User";
 import { randomUUID } from "crypto";
 import { queueDbOperation } from "../utils/dbQueue";
-import { Chess } from "chess.js";
-import { client, publisherClient, subscriberClient } from "../redis";
+import { publisherClient } from "../redis";
 import { gameListPayload, gamePayload } from "../utils/helper";
 
 interface Room {
@@ -479,12 +478,7 @@ export class GameManager {
     //* publish
     const liveGames: any = []
     this.games.forEach((game) => {
-      const gameData = {
-        player1: { id: game.player1.id, username: game.player1.username },
-        player2: { id: game.player2.id, username: game.player2.username },
-        startTime: game.startTime,
-        gameId: game.gameId
-      }
+      const gameData = gameListPayload(game)
       liveGames.push(gameData)
     })
 
@@ -511,12 +505,7 @@ export class GameManager {
 
     const liveGames: any = []
     this.games.forEach((game) => {
-      const gameData = {
-        player1: game.player1,
-        player2: game.player2,
-        startTime: game.startTime,
-        gameId: game.gameId
-      }
+      const gameData = gameListPayload(game)
       liveGames.push(gameData)
     })
     publisherClient.publish(LIVE_GAMES_LIST, JSON.stringify({ liveGames }))

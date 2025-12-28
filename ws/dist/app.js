@@ -28,12 +28,4 @@ app.use((req, res) => {
         message: 'Route not found',
     });
 });
-// Error handler
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).json({
-        success: false,
-        message: 'Internal server error',
-    });
-});
 exports.default = app;
