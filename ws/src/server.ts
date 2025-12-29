@@ -1,16 +1,16 @@
 import app from './app';
 import { handleWebSocket, initializeConnections } from './ws/socketManager';
 
-const HTTP_PORT = process.env.HTTP_PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 // Start HTTP server
 export const httpServer = () => {
-    app.listen(HTTP_PORT, () => {
-        console.log(`HTTP server started on port ${HTTP_PORT}`);
+    app.listen(PORT, () => {
+        console.log(`HTTP server started on port ${PORT}`);
     });
 }
 
-// httpServer()
+httpServer()
 
 handleWebSocket()
 
@@ -23,8 +23,8 @@ initializeConnections().catch((error) => {
 process.on('uncaughtException', (error) => {
     console.error('Uncaught Exception:', error);
     console.error('Stack:', error.stack);
-  });
-  
-  process.on('unhandledRejection', (reason, promise) => {
+});
+
+process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  });
+});

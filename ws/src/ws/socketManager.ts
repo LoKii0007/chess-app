@@ -6,10 +6,10 @@ import { connectRedis } from '../redis';
 import { startDbQueueProcessor } from '../utils/dbQueue';
 import prisma from '../config/db';
 
-const WS_PORT: number = Number(process.env.WS_PORT) || 8080;
+const PORT: number = Number(process.env.PORT) || 8080;
 
-export const wss = new WebSocketServer({ port: WS_PORT });
-console.log(`WebSocket server started on port ${WS_PORT}`);
+export const wss = new WebSocketServer({ port: PORT });
+console.log(`WebSocket server started on port ${PORT}`);
 
 // Initialize game manager 
 export const gameManager = new GameManager();

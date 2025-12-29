@@ -6,15 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.httpServer = void 0;
 const app_1 = __importDefault(require("./app"));
 const socketManager_1 = require("./ws/socketManager");
-const HTTP_PORT = process.env.HTTP_PORT || 3000;
+const PORT = process.env.PORT || 3000;
 // Start HTTP server
 const httpServer = () => {
-    app_1.default.listen(HTTP_PORT, () => {
-        console.log(`HTTP server started on port ${HTTP_PORT}`);
+    app_1.default.listen(PORT, () => {
+        console.log(`HTTP server started on port ${PORT}`);
     });
 };
 exports.httpServer = httpServer;
-// httpServer()
+(0, exports.httpServer)();
 (0, socketManager_1.handleWebSocket)();
 (0, socketManager_1.initializeConnections)().catch((error) => {
     console.error('Failed to initialize application:', error);

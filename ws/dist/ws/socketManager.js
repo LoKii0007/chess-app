@@ -20,9 +20,9 @@ const subscriber_1 = require("../utils/subscriber");
 const redis_1 = require("../redis");
 const dbQueue_1 = require("../utils/dbQueue");
 const db_1 = __importDefault(require("../config/db"));
-const WS_PORT = Number(process.env.WS_PORT) || 8080;
-exports.wss = new ws_1.WebSocketServer({ port: WS_PORT });
-console.log(`WebSocket server started on port ${WS_PORT}`);
+const PORT = Number(process.env.PORT) || 8080;
+exports.wss = new ws_1.WebSocketServer({ port: PORT });
+console.log(`WebSocket server started on port ${PORT}`);
 // Initialize game manager 
 exports.gameManager = new gameManager_1.GameManager();
 const handleWebSocket = () => {
