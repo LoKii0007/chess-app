@@ -1,18 +1,19 @@
+import http from 'http';
 import app from './app';
 import { handleWebSocket, initializeConnections } from './ws/socketManager';
 
 const PORT = process.env.PORT || 3000;
 
+// Create HTTP server from Express app
+const server = http.createServer(app);
+
 // Start HTTP server
-export const httpServer = () => {
-    app.listen(PORT, () => {
-        console.log(`HTTP server started on port ${PORT}`);
-    });
-}
+server.listen(PORT, () => {
+    console.log(`HTTP & WebSocket server started on port ${PORT}`);
+});
 
-httpServer()
-
-handleWebSocket()
+// Attach WebSocket to the same HTTP server
+handleWebSocket(server)
 
 initializeConnections().catch((error) => {
     console.error('Failed to initialize application:', error);

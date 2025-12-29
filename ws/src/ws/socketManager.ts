@@ -1,4 +1,5 @@
 import { WebSocketServer } from 'ws';
+import { Server } from 'http';
 import { GameManager } from '../gameEngine/gameManager';
 import { User } from '../gameEngine/User';
 import { startSubscribers } from '../utils/subscriber';
@@ -6,15 +7,15 @@ import { connectRedis } from '../redis';
 import { startDbQueueProcessor } from '../utils/dbQueue';
 import prisma from '../config/db';
 
-const PORT: number = Number(process.env.PORT) || 8080;
-
-export const wss = new WebSocketServer({ port: PORT });
-console.log(`WebSocket server started on port ${PORT}`);
-
 // Initialize game manager 
 export const gameManager = new GameManager();
 
-export const handleWebSocket = () => {
+export let wss: WebSocketServer;
+
+export const handleWebSocket = (server: Server) => {
+    // Attach WebSocket server to the HTTP server
+    wss = new WebSocketServer({ server });
+    console.log('WebSocket server attached to HTTP server');
     wss.on("connection", function connection(ws, req) {
         const user = new User(ws);
         gameManager.addUser(user);
