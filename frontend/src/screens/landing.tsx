@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import type { Variants } from "motion/react";
 import { ArrowRight } from "lucide-react";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -62,6 +64,10 @@ const Landing = () => {
       transition: { type: "spring", stiffness: 300, damping: 20 },
     },
   };
+
+  useEffect(() => {
+    toast.custom("Running on a free server. This might take a while to start");
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-white selection:text-black overflow-hidden flex flex-col pt-[70px]">
